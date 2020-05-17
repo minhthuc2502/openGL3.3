@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(GameEngine)
+project(Bras_robot_AL5D)
 
 #Settings
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
@@ -13,19 +13,24 @@ find_package(GLEW REQUIRED)
 find_package(glm REQUIRED)
 
 #Setting
-include_directories(${CMAKE_SOURCE_DIR}/tuto_01/Header
+include_directories(${CMAKE_SOURCE_DIR}/3Dgraphique/includes
                     ${GLEW_INCLUDE_DIRS}
                     ${GLM_INCLUDE_DIRS}
                     /usr/lib/x86_64-linux-gnu/)
 
 #file
-file(GLOB_RECURSE ENGINE_SOURCES  ${CMAKE_SOURCE_DIR}/tuto_01/Source/*.cpp ${CMAKE_SOURCE_DIR}/tuto_01/Source/*.c)
-file(GLOB_RECURSE ENGINE_HEADERS ${CMAKE_SOURCE_DIR}/tuto_01/Header/*.hpp ${CMAKE_SOURCE_DIR}/tuto_01/Header/*.h ${CMAKE_SOURCE_DIR}/tuto_01/Header/*.inl)
+file(GLOB_RECURSE ENGINE_SOURCES  ${CMAKE_SOURCE_DIR}/3Dgraphique/sources/*.cpp ${CMAKE_SOURCE_DIR}/3Dgraphique/sources/*.c)
+file(GLOB_RECURSE ENGINE_HEADERS ${CMAKE_SOURCE_DIR}/3Dgraphique/includes*.hpp ${CMAKE_SOURCE_DIR}/3Dgraphique/includes*.h)
 
-add_executable(Tuto_01 ${ENGINE_SOURCES} ${ENGINE_HEADERS})
-set_property(TARGET Tuto_01 PROPERTY CXX_STANDARD 11)
-target_link_libraries(Tuto_01 
+add_executable(bras3D ${ENGINE_SOURCES} ${ENGINE_HEADERS})
+set_property(TARGET bras3D PROPERTY CXX_STANDARD 11)
+target_link_libraries(bras3D 
                         glfw
+                        dl
+                        pthread
+                        GL
+                        Xrandr
+                        Xi 
                         ${GLEW_LIBRARIES}
                         ${GLM_LIBRARIES}
                         )

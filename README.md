@@ -1,7 +1,7 @@
 # Description
-Game Engine with openGL 3.3 (Open Graphics Library) and game engine `Rasterization` to render image.
+Design 3D graphique with openGL 3.3 (Open Graphics Library).
 
-## Run Engine
+## Installation packages 
 - Intall packages for application:
 
 ```
@@ -13,7 +13,8 @@ $ sudo apt-get install libglew-dev
 $ sudo apt-get install libglm-dev
 ```
 
-- Run application:
+## Run 3D graphique
+
 ```
 # Run application
 $ ./build.sh all
