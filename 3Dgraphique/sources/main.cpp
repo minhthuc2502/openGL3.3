@@ -2,6 +2,8 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <cmath>
+#include "shader.hpp"
+#include "stb_image.h"
 /**
  * Call back function when resize window
 */
@@ -18,55 +20,24 @@ void processInput(GLFWwindow* window)
 
 int main()
 {
-    int success;
-    char infolog[512];
     float vertices[] = {    
-            //Positions           //colors
-        0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f, 0.0f, // top right
-        0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f, 0.0f, // bottom right
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom left
-        -0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f  // top left 
+            //Positions           //colors              // texture coords      
+        0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f, 0.0f,    0.55f,  0.55f,         // top right
+        0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f, 0.0f,    0.55f,  0.45f,         // bottom right
+        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,    0.45f,  0.45f,         // bottom left
+        -0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,    0.45f,  0.55f          // top left 
     };
 
     unsigned int indices[] = {  // note that we start from 0!
         0, 1, 3,   // first triangle
         1, 2, 3    // second triangle
     }; 
-
-    const char *vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "layout (location = 1) in vec4 aColor;\n"
-    "out vec4 vertexColor;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos, 1.0);\n"
-    "   vertexColor = aColor;\n"
-    "}\0";
-      // version declare vertex color in vertex shader
-    const char *fragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "in vec4 vertexColor;\n"
-    "void main()\n"
-    "{\n"
-    "FragColor = vertexColor;\n"
-    "}\n";
-    // using uniform color
-    /*
-    const char *fragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "uniform vec4 varyColor;\n"
-    "void main()\n"
-    "{\n"
-    "FragColor = varyColor;\n"
-    "}\n";
-    */
-    unsigned int vertexShader;
-    unsigned int fragmentShader;
-    unsigned int shaderProgram;
     unsigned int VBO;
     unsigned int VAO;
     unsigned int EBO;
-    
+    unsigned int texture1;
+    unsigned int texture2;
+    int width, height, nrChennels;
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -100,6 +71,9 @@ int main()
     // declare a callback function to handle of view when user resize the window
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+    // Build and compile shader program
+    Shader pShader("../3Dgraphique/shaders/3.3.shader.vs", "../3Dgraphique/shaders/3.3.shader.fs");
+
     std::cout << "Generate VBO" << std::endl;
     // Generate Vetex buffer to save data vertice on GPU
     glGenBuffers(1, &VBO);
@@ -123,64 +97,64 @@ int main()
      * Element buffer object handle the problem when duplicate the vertices when draw image
      * Element can keep index of vertice so we avoid the phenomene of duplication
     */
+    std::cout << "Generate EBO" << std::endl;
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices, GL_STATIC_DRAW);
 
-    std::cout << "Create Vertex Shader" << std::endl;
-    // create a vertex shader
-    // vertex shader used to transfert 3d coordiante to the coordinate in region visible
-    // it also assemble the coordinate to the shape which we want
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    // shader is wrote in another language. So we need to attach the vertexshader to the code in GLSL and compile it
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-    // Check if compile successfully
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infolog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infolog << std::endl;
-    }
-    std::cout << "Create Fragment Shader" << std::endl;
-    // fragment shader is all about calculating the color output of pixels
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-    // Check if compile successfully
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infolog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infolog << std::endl;
-    }
-    std::cout << "Create program Shader" << std::endl;
-    // shader program to link shaders
-    shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(shaderProgram, 512, NULL, infolog);
-        std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infolog << std::endl;
-    }
     std::cout << "Configure vertex arttribute" << std::endl;
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7* sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(7 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    // Generate Textures
+    glGenTextures(1, &texture1);
+    glGenTextures(1, &texture2);
+    // set the Textture wrapping/filtering options
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // Load image generate texture
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+    unsigned char *data = stbi_load("../3Dgraphique/images/container.jpg", &width, &height, &nrChennels, 0);
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, texture2);
+    stbi_set_flip_vertically_on_load(true);  
+    data = stbi_load("../3Dgraphique/images/awesomeface.png", &width, &height, &nrChennels, 0);
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);  // .png using GL_RGBA (A for transparency)
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+
+    stbi_image_free(data);
+
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0); 
-    std::cout << "Active program Shader" << std::endl;
-    // active shader program
-    glUseProgram(shaderProgram);
-    // Delete shader after linking, not useful anymore
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
 
+    // Indicate texture unit (location of texture) for the uniform in fragment shader. Example it says that the location of uniform Texture1 have location 1 is correspondant GL_TEXTURE1 ~ texture1
+    pShader.use();
+    pShader.setInt("Texture1", 1);
+    pShader.setInt("Texture2", 2);
     while (!glfwWindowShouldClose(window))
     {
         // check if user press esc key (INPUT)
@@ -190,13 +164,19 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         // draw object (triangle)
-        glUseProgram(shaderProgram);
-        // update the uniform color
+        pShader.use();
+        
+        // bind Texture
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture1);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, texture2);
+        /*
         float timevalue = glfwGetTime();
         float greenValue = sin(timevalue) / 2.0f + 0.5f;
         int vertexColorLocation = glGetUniformLocation(shaderProgram, "varyColor");
         glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-
+        */
         glBindVertexArray(VAO);
         //glDrawArrays(GL_TRIANGLES, 0, 3);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -210,7 +190,6 @@ int main()
     // ------------------------------------------------------------------------
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteProgram(shaderProgram);
     glfwTerminate();
     return 0;
 }
