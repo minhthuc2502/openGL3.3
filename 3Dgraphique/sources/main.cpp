@@ -20,11 +20,12 @@ int main()
 {
     int success;
     char infolog[512];
-    float vertices[] = {
-        0.5f,  0.5f, 0.0f,  // top right
-        0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f   // top left 
+    float vertices[] = {    
+            //Positions           //colors
+        0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f, 0.0f, // top right
+        0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom left
+        -0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f  // top left 
     };
 
     unsigned int indices[] = {  // note that we start from 0!
@@ -34,13 +35,14 @@ int main()
 
     const char *vertexShaderSource = "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
+    "layout (location = 1) in vec4 aColor;\n"
     "out vec4 vertexColor;\n"
     "void main()\n"
     "{\n"
     "   gl_Position = vec4(aPos, 1.0);\n"
-    "   vertexColor = vec4(0.5, 0.0, 0.0, 1.0);\n"
+    "   vertexColor = aColor;\n"
     "}\0";
-    /*
+      // version declare vertex color in vertex shader
     const char *fragmentShaderSource = "#version 330 core\n"
     "out vec4 FragColor;\n"
     "in vec4 vertexColor;\n"
@@ -48,7 +50,8 @@ int main()
     "{\n"
     "FragColor = vertexColor;\n"
     "}\n";
-    */
+    // using uniform color
+    /*
     const char *fragmentShaderSource = "#version 330 core\n"
     "out vec4 FragColor;\n"
     "uniform vec4 varyColor;\n"
@@ -56,7 +59,7 @@ int main()
     "{\n"
     "FragColor = varyColor;\n"
     "}\n";
-
+    */
     unsigned int vertexShader;
     unsigned int fragmentShader;
     unsigned int shaderProgram;
@@ -164,8 +167,10 @@ int main()
         std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infolog << std::endl;
     }
     std::cout << "Configure vertex arttribute" << std::endl;
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3* sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7* sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0); 
