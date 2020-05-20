@@ -7,16 +7,13 @@
 #include <cmath>
 #include "shader.hpp"
 #include "stb_image.h"
-
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+#include "camera.hpp"
+#include "window.hpp"
+camera ucamera;
 float deltaTime = 0.0f; // Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 float lastX = 400, lastY = 300;
-float pitch = 0.0f;
-float yaw = 90.0f;
-float fov = 45.0f;
+
 /**
  * Call back function when resize window
 */
@@ -34,23 +31,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
     float yOffset = ypos - lastY;
     lastX = xpos;
     lastY = ypos;
-
-    const float sensitivity = 0.1f;
-    xOffset = xOffset * sensitivity;
-    yOffset = yOffset * sensitivity;
-
-    yaw -= xOffset;
-    pitch += yOffset;
-
-    if(pitch > 89.0f)
-        pitch = 89.0f;
-    if(pitch < -89.0f)
-        pitch = -89.0f;
-    glm::vec3 direction;
-    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    direction.y = sin(glm::radians(pitch));
-    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    cameraFront = glm::normalize(direction);
+    ucamera.processMouseMovement(xOffset, yOffset);
 }
 
 /**
@@ -58,25 +39,20 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 */
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 {
-    fov -= (float)yoffset;
-    if (fov < 1.0f)
-        fov = 1.0f;
-    if (fov > 45.0f)
-        fov = 45.0f;
+    ucamera.processMouseScoll((float)yoffset);
 }
 void processInput(GLFWwindow* window)
 {
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    const float cameraSpeed = 2.5f * deltaTime;
     if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        cameraPos += cameraSpeed * cameraFront;
+        ucamera.processKeyBoard(FORWARD, deltaTime);
     if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        cameraPos -= cameraSpeed * cameraFront;
+        ucamera.processKeyBoard(BACKWARD, deltaTime);
     if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        ucamera.processKeyBoard(LEFT, deltaTime);
     if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;    
+        ucamera.processKeyBoard(RIGHT, deltaTime);
 }
 
 int main()
@@ -141,39 +117,18 @@ int main()
     unsigned int texture1;
     unsigned int texture2;
     int width, height, nrChennels;
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    // using open gl core proifle to opengl more effective and flexible but more difficult => need to use it
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    
-    GLFWwindow* window = glfwCreateWindow(800,600,"Bras3DGL", NULL, NULL);
-    if (window == NULL)
-    {
-        std::cout << "Failed to create GFLW Window" << std::endl;
-        glfwTerminate();
-        return -1;
+    window uwindow((char*)"bras3D");
+    try{
+        uwindow.initialize();
     }
-    glfwMakeContextCurrent(window);
-
-    /**
-     * call glad to manage all function of OpenGL that we want to use before call function openGL
-     * glfw provide glfwGetProcAddress to define correct function base on OS compile for
-     * glad load adress of the OpenGL function pointers. 
-     */
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    catch (std::runtime_error error)
     {
-        std::cout << "Failed to initialize glad" << std::endl;
-        return -1;
+        std::cerr << "Exception: " << error.what() << std::endl;
     }
-    /**
-     * tell openGL size to render on window
-    */
-    glViewport(0, 0, 800, 600);
-
-    // declare a callback function to handle of view when user resize the window
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
+    catch(std::bad_alloc& error)
+    {
+        std::cerr << "Exception: " << error.what() << std::endl;
+    }
     // Build and compile shader program
     Shader pShader("../3Dgraphique/shaders/3.3.shader.vs", "../3Dgraphique/shaders/3.3.shader.fs");
 
@@ -272,14 +227,13 @@ int main()
         glm::vec3(-1.3f,  1.0f, -1.5f)  
     };
 
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetCursorPosCallback(uwindow.mpwindow, mouse_callback);
 
-    glfwSetScrollCallback(window, scroll_callback);
-    while (!glfwWindowShouldClose(window))
+    glfwSetScrollCallback(uwindow.mpwindow, scroll_callback);
+    while (!glfwWindowShouldClose(uwindow.mpwindow))
     {
         // check if user press esc key (INPUT)
-        processInput(window);
+        processInput(uwindow.mpwindow);
 
         // Rendering command
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -307,12 +261,12 @@ int main()
         lastFrame = currentFrame;
 
         glm::mat4 view;
-        view = glm::lookAt(cameraPos , cameraPos + cameraFront, cameraUp);
+        view = ucamera.getViewSpace();
         transformLoc = glGetUniformLocation(pShader.getId(), "view");
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(view));
 
         glm::mat4 projection;
-        projection = glm::perspective(glm::radians(fov), 800.0f/600.0f, 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(ucamera.getFov()), 800.0f/600.0f, 0.1f, 100.0f);
         transformLoc = glGetUniformLocation(pShader.getId(), "projection");
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
@@ -328,7 +282,7 @@ int main()
         }
         glBindVertexArray(0);
         // swap color buffer to render image on window
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(uwindow.mpwindow);
         // catch event
         glfwPollEvents();
     }
