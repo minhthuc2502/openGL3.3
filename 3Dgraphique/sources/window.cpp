@@ -47,3 +47,13 @@ void window::terminate()
         free(title);
     std::cout << "Window Terminated" << std::endl;
 }
+
+float window::getWidth()
+{
+    return width;
+}
+
+float window::getHeight()
+{
+    return height;
+}

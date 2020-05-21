@@ -22,5 +22,7 @@ public:
 
     void initialize();
     void terminate();
+    float getWidth();
+    float getHeight();
 };
 #endif

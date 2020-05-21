@@ -9,6 +9,7 @@
 #include "stb_image.h"
 #include "camera.hpp"
 #include "window.hpp"
+#include "texture.hpp"
 camera ucamera;
 float deltaTime = 0.0f; // Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
@@ -114,18 +115,11 @@ int main()
     unsigned int VBO;
     unsigned int VAO;
     unsigned int EBO;
-    unsigned int texture1;
-    unsigned int texture2;
-    int width, height, nrChennels;
     window uwindow((char*)"bras3D");
     try{
         uwindow.initialize();
     }
     catch (std::runtime_error error)
-    {
-        std::cerr << "Exception: " << error.what() << std::endl;
-    }
-    catch(std::bad_alloc& error)
     {
         std::cerr << "Exception: " << error.what() << std::endl;
     }
@@ -169,42 +163,16 @@ int main()
     //glEnableVertexAttribArray(2);
 
     // Generate Textures
-    glGenTextures(1, &texture1);
-    glGenTextures(1, &texture2);
-    // set the Textture wrapping/filtering options
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // Load image generate texture
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, texture1);
-    unsigned char *data = stbi_load("../3Dgraphique/images/container.jpg", &width, &height, &nrChennels, 0);
-    if (data)
+    texture texture1, texture2;
+    try
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
+        texture1.initialize("../3Dgraphique/images/container.jpg", 2, uwindow);
+        texture2.initialize("../3Dgraphique/images/awesomeface.png", 2, uwindow);
     }
-    else
+    catch (std::runtime_error error)
     {
-        std::cout << "Failed to load texture" << std::endl;
+        std::cerr << "Exception: " << error.what() << std::endl;
     }
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, texture2);
-    stbi_set_flip_vertically_on_load(true);  
-    data = stbi_load("../3Dgraphique/images/awesomeface.png", &width, &height, &nrChennels, 0);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);  // .png using GL_RGBA (A for transparency)
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-
-    stbi_image_free(data);
-
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0); 
@@ -213,6 +181,7 @@ int main()
     pShader.use();
     pShader.setInt("Texture1", 1);
     pShader.setInt("Texture2", 2);
+    // openGl handle which point on override the other points
     glEnable(GL_DEPTH_TEST);
     glm::vec3 cubePositions[] = {
         glm::vec3( 0.0f,  0.0f,  0.0f), 
@@ -226,28 +195,20 @@ int main()
         glm::vec3( 1.5f,  0.2f, -1.5f), 
         glm::vec3(-1.3f,  1.0f, -1.5f)  
     };
-
     glfwSetCursorPosCallback(uwindow.mpwindow, mouse_callback);
-
     glfwSetScrollCallback(uwindow.mpwindow, scroll_callback);
     while (!glfwWindowShouldClose(uwindow.mpwindow))
     {
         // check if user press esc key (INPUT)
         processInput(uwindow.mpwindow);
-
         // Rendering command
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         // draw object (triangle)
         pShader.use();
-        
         // bind Texture
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texture1);
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, texture2);
-        unsigned int transformLoc;
-
+        texture1.bind(GL_TEXTURE1);
+        texture2.bind(GL_TEXTURE2);
         /*
         float timevalue = glfwGetTime();
         float greenValue = sin(timevalue) / 2.0f + 0.5f;
@@ -259,16 +220,14 @@ int main()
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-
+        
         glm::mat4 view;
         view = ucamera.getViewSpace();
-        transformLoc = glGetUniformLocation(pShader.getId(), "view");
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(view));
+        pShader.set4MatrixFloat("view", view);
 
         glm::mat4 projection;
         projection = glm::perspective(glm::radians(ucamera.getFov()), 800.0f/600.0f, 0.1f, 100.0f);
-        transformLoc = glGetUniformLocation(pShader.getId(), "projection");
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(projection));
+        pShader.set4MatrixFloat("projection", projection);
 
         for (unsigned int i = 0; i < 10; i++)
         {
@@ -276,8 +235,7 @@ int main()
             model = glm::translate(model, cubePositions[i]);
             float angle = 20.0f * i;
             model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-            transformLoc = glGetUniformLocation(pShader.getId(), "model");
-            glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model));
+            pShader.set4MatrixFloat("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
         glBindVertexArray(0);
