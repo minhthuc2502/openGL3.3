@@ -11,7 +11,6 @@ set(CMAKE_MODULE_PATH /usr/share/cmake-3.10/Modules/)
 find_package(glfw3 REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glm REQUIRED)
-
 #Setting
 include_directories(${CMAKE_SOURCE_DIR}/3Dgraphique/includes
                     ${GLEW_INCLUDE_DIRS}
@@ -30,7 +29,8 @@ target_link_libraries(bras3D
                         pthread
                         GL
                         Xrandr
-                        Xi 
+                        Xi
+                        assimp
                         ${GLEW_LIBRARIES}
                         ${GLM_LIBRARIES}
                         )
