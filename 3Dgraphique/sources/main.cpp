@@ -79,7 +79,7 @@ int main()
     glfwSetScrollCallback(uwindow.mpwindow, scroll_callback);
 
     // Load models
-    char path[] = "../3Dgraphique/images/backpack/backpack.obj";
+    char path[] = "../3Dgraphique/images/arm-al5d/armAL5D.obj";
     Model guitarModel(path);
 
     while (!glfwWindowShouldClose(uwindow.mpwindow))
@@ -87,7 +87,7 @@ int main()
         // check if user press esc key (INPUT)
         processInput(uwindow.mpwindow);
         // Rendering command
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        // glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         // Use shader

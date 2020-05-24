@@ -19,7 +19,7 @@ include_directories(${CMAKE_SOURCE_DIR}/3Dgraphique/includes
 
 #file
 file(GLOB_RECURSE ENGINE_SOURCES  ${CMAKE_SOURCE_DIR}/3Dgraphique/sources/*.cpp ${CMAKE_SOURCE_DIR}/3Dgraphique/sources/*.c)
-file(GLOB_RECURSE ENGINE_HEADERS ${CMAKE_SOURCE_DIR}/3Dgraphique/includes*.hpp ${CMAKE_SOURCE_DIR}/3Dgraphique/includes*.h)
+file(GLOB_RECURSE ENGINE_HEADERS ${CMAKE_SOURCE_DIR}/3Dgraphique/includes/*.hpp ${CMAKE_SOURCE_DIR}/3Dgraphique/includes/*.h)
 
 add_executable(bras3D ${ENGINE_SOURCES} ${ENGINE_HEADERS})
 set_property(TARGET bras3D PROPERTY CXX_STANDARD 11)

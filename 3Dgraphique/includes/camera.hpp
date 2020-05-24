@@ -13,10 +13,10 @@ enum Camera_movement {
 
 // Default camera value
 const float PITCH = 0.0f;
-const float YAW = 90.0f;
+const float YAW = -90.0f;
 const float FOV = 45.0f;
-const float sensitivity = 0.1f;
-const float speed = 2.5f;
+const float sensitivity = 0.01f;
+const float speed = 1.5f;
 class camera
 {
 private:
@@ -63,5 +63,6 @@ public:
     float getPitch(void);
     float getYaw(void);
     float getFov(void);
+    glm::vec3 getCameraPos(void);
 };
 #endif

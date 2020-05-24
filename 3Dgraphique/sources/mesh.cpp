@@ -1,11 +1,11 @@
 #include "mesh.hpp"
 
-Mesh::Mesh(vector<Vertex> vertices, vector<Texture> textures, vector<unsigned int> indices)
+Mesh::Mesh(vector<Vertex> vertices, vector<Texture> textures, vector<unsigned int> indices, Material materials)
 {
     this->vertices = vertices;
     this->textures = textures;
     this->indices = indices;
-
+    this->materials = materials;
     setupMesh();
 }
 
@@ -69,6 +69,10 @@ void Mesh::draw(Shader shader)
     }
     glActiveTexture(0);
 
+    shader.setVec3("material.diffuse", materials.Diffuse);
+    shader.setVec3("material.specular", materials.Specular);
+    shader.setVec3("material.ambient", materials.Ambient);
+    shader.setFloat("material.shininess", materials.Shininess);
     // draw mesh
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);

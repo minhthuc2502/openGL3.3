@@ -83,6 +83,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
             indices.push_back(face.mIndices[j]);
     }
     // process material
+    Material mat;
     if (mesh->mMaterialIndex >= 0)  // check if mesh contain material
     {
         aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
@@ -90,8 +91,9 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
         vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+        mat = loadMaterial(material);
     }
-    return Mesh(vertices, textures, indices);
+    return Mesh(vertices, textures, indices, mat);
 }
 
 vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName)
@@ -159,4 +161,24 @@ unsigned int TextureFromFile(const char *path, const string &directory)
         stbi_image_free(data);
     }
     return textureID;
+}
+
+Material Model::loadMaterial(aiMaterial *mat)
+{
+    Material material;
+    aiColor3D color(0.f, 0.f, 0.f);
+    float shininess;
+
+    mat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+    material.Diffuse = glm::vec3(color.r, color.g, color.b);
+
+    mat->Get(AI_MATKEY_COLOR_SPECULAR, color);
+    material.Specular = glm::vec3(color.r, color.g, color.b);
+
+    mat->Get(AI_MATKEY_COLOR_AMBIENT, color);
+    material.Specular = glm::vec3(color.r, color.g, color.b);
+
+    mat->Get(AI_MATKEY_SHININESS, shininess);
+    material.Shininess = shininess;
+    return material;
 }

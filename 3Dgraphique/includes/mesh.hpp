@@ -21,6 +21,13 @@ struct Texture
     string path;        // store the path of the texture to compare with other textures. Don't reload teexture multiple times
 };
 
+struct Material {
+    glm::vec3 Diffuse;
+    glm::vec3 Specular;
+    glm::vec3 Ambient;
+    float Shininess;
+};
+
 class Mesh
 {
 private:
@@ -30,9 +37,10 @@ private:
 public:
     vector<Vertex> vertices;
     vector<Texture> textures;
+    Material materials;
     vector<unsigned int> indices;
 
-    Mesh(vector<Vertex> vertices, vector<Texture> textures, vector<unsigned int> indices);
+    Mesh(vector<Vertex> vertices, vector<Texture> textures, vector<unsigned int> indices, Material materials);
     void draw(Shader shader);
 };
 #endif
