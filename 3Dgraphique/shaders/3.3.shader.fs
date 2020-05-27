@@ -26,5 +26,5 @@ uniform Light light;
 void main()
 {
     vec3 result = material.diffuse;
-    FragColor = vec4(result, 1.0);
+    FragColor = vec4(result, 1.0) * vec4(1.0, 1.0, 1.0, 1.0);
 }

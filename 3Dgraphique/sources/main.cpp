@@ -60,7 +60,7 @@ int main()
 {
     // Initialize window
     window uwindow((char*)"bras3D");
-    try{
+    try {
         uwindow.initialize();
     }
     catch (std::runtime_error error)
@@ -87,7 +87,7 @@ int main()
         // check if user press esc key (INPUT)
         processInput(uwindow.mpwindow);
         // Rendering command
-        // glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         // Use shader
