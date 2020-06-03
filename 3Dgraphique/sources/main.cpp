@@ -15,7 +15,7 @@ camera ucamera;
 float deltaTime = 0.0f; // Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 float lastX = 400, lastY = 300;
-float angle[5] = {0};
+float angle[6] = {0};
 std::vector<glm::mat4> model (8);
 
 void ModelInitPos(std::vector<glm::mat4> &m)
@@ -39,7 +39,6 @@ void ModelInitPos(std::vector<glm::mat4> &m)
 
 void shoulder_rot(std::vector<glm::mat4> &m, float a = 0)
 {
-  //cout << "button left pressed" << endl;
   std::vector<glm::mat4>::size_type sz = m.size();
   m[2] = glm::translate(m[2], glm::vec3(-3.46, -73.18, 17.29));
   m[3] = glm::translate(m[3], glm::vec3(4.372, -88.37, -21.82));
@@ -61,7 +60,6 @@ void shoulder_rot(std::vector<glm::mat4> &m, float a = 0)
 
 void bicep_below_rot(std::vector<glm::mat4> &m, float a = 0)
 {
-    //cout << "button left pressed" << endl;
   std::vector<glm::mat4>::size_type sz = m.size();
   m[2] = glm::translate(m[2], glm::vec3(-24.056, -58.03, 13.18));
   m[3] = glm::translate(m[3], glm::vec3(4.372, -73.22, -25.93));
@@ -82,7 +80,6 @@ void bicep_below_rot(std::vector<glm::mat4> &m, float a = 0)
 
 void bicep_above_rot(std::vector<glm::mat4> &m, float a = 0)
 {
-  //cout << "button left pressed" << endl;
   std::vector<glm::mat4>::size_type sz = m.size();
   m[3] = glm::translate(m[3], glm::vec3(0.0, 28.83, -56.45));
   m[4] = glm::translate(m[4], glm::vec3(0.0, 43.64, -129.373));
@@ -101,7 +98,6 @@ void bicep_above_rot(std::vector<glm::mat4> &m, float a = 0)
 
 void wrist_rot(std::vector<glm::mat4> &m, float a = 0)
 {
-  //cout << "button left pressed" << endl;
   std::vector<glm::mat4>::size_type sz = m.size();
   m[4] = glm::translate(m[4], glm::vec3(0.0, -6.98, -37.28));
   m[5] = glm::translate(m[5], glm::vec3(0.0, -0.04, -70.603));
@@ -118,17 +114,24 @@ void wrist_rot(std::vector<glm::mat4> &m, float a = 0)
 
 void rail_rot(std::vector<glm::mat4> &m, float a = 0)
 {
-  //cout << "button left pressed" << endl;
   std::vector<glm::mat4>::size_type sz = m.size();
-  m[5] = glm::translate(m[5], glm::vec3(0.0, -0.04, 2.1584));
-  m[6] = glm::translate(m[6], glm::vec3(0.0, 0.0, -7.6751));
-  m[7] = glm::translate(m[7], glm::vec3(0.0, 0.01, -17.9756));
+  m[5] = glm::translate(m[5], glm::vec3(-0.432, -0.04, 2.1584));
+  m[6] = glm::translate(m[6], glm::vec3(28.279, 0.0, -7.6751));
+  m[7] = glm::translate(m[7], glm::vec3(-23.14, 0.01, -17.9756));
   for (unsigned int i = 5; i < sz; i++) {
       m[i] = glm::rotate(m[i], glm::radians(a), glm::vec3(-0.1964, 0.0, 0.98052));
   }
-  m[5] = glm::translate(m[5], glm::vec3(0.0, 0.04, -2.1584));
-  m[6] = glm::translate(m[6], glm::vec3(0.0, 0.0, 7.6751));
-  m[7] = glm::translate(m[7], glm::vec3(0.0, -0.01, 17.9756));
+  m[5] = glm::translate(m[5], glm::vec3(0.432, 0.04, -2.1584));
+  m[6] = glm::translate(m[6], glm::vec3(-28.279, 0.0, 7.6751));
+  m[7] = glm::translate(m[7], glm::vec3(23.14, -0.01, 17.9756));
+}
+
+void wrist_mov(std::vector<glm::mat4> &m, float a = 0)
+{
+  if (a == -1) {
+    m[6] = glm::translate(m[6], glm::vec3(14, 0.0, 0.0));
+    m[7] = glm::translate(m[7], glm::vec3(-14, 0.0, 0.0));
+  }
 }
 
 void update_position(std::vector<glm::mat4> &m)
@@ -139,6 +142,7 @@ void update_position(std::vector<glm::mat4> &m)
   bicep_above_rot(m, angle[2]);
   wrist_rot(m, angle[3]);
   rail_rot(m, angle[4]);
+  wrist_mov(m, angle[5]);
 }
 
 /**
@@ -223,6 +227,16 @@ void processInput(GLFWwindow *window) {
   if (glfwGetKey(window, GLFW_KEY_KP_3) == GLFW_PRESS)    // 1 direction to down
   {
     angle[4] += 2.0f;
+    update_position(model);
+  }
+  if (glfwGetKey(window, GLFW_KEY_KP_7) == GLFW_PRESS)    // 1 direction to down
+  {
+    angle[5] = 0;
+    update_position(model);
+  }
+  if (glfwGetKey(window, GLFW_KEY_KP_9) == GLFW_PRESS)    // 1 direction to down
+  {
+    angle[5] = -1;
     update_position(model);
   }
 }

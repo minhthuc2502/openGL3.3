@@ -29,7 +29,6 @@ target_link_libraries(bras3D
                         pthread
                         GL
                         Xrandr
-                        Xi
                         assimp
                         ${GLEW_LIBRARIES}
                         ${GLM_LIBRARIES}
