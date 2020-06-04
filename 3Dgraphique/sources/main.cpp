@@ -16,6 +16,7 @@ float deltaTime = 0.0f; // Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 float lastX = 400, lastY = 300;
 float angle[6] = {0};
+bool pressed[10] = {false};
 std::vector<glm::mat4> model (8);
 
 void ModelInitPos(std::vector<glm::mat4> &m)
@@ -24,8 +25,6 @@ void ModelInitPos(std::vector<glm::mat4> &m)
   for (unsigned int i = 0; i < sz; i++)
   {
     m[i] = glm::mat4(0.1f);
-    //m[i] = glm::rotate(m[i], glm::radians(-45.0f), glm::vec3(0.0, 0.0, 1.0));
-    //m[i] = glm::translate(m[i], glm::vec3(-60.0f, 30.0f, -30.0f));
     m[i] = glm::scale(m[i], glm::vec3(0.2f, 0.2f, 0.2f));
   }
   m[1] = glm::translate(m[1], glm::vec3(99.0, 113.76, -131.75));
@@ -180,54 +179,94 @@ void processInput(GLFWwindow *window) {
     ucamera.processKeyBoard(LEFT, deltaTime);
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     ucamera.processKeyBoard(RIGHT, deltaTime);
-  if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-    angle[0] += 2.0f;
+  if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS && !pressed[0]) {
+    angle[0] += 15.0f;
     update_position(model);
-  }
-  if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+    pressed[0] = true;
+  } else if (glfwGetKey(window, GLFW_KEY_LEFT) != GLFW_PRESS)
   {
-    angle[0] -= 2.0f;
-    update_position(model);
+    pressed[0] = false;
   }
-  if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)      // 0 direction to up
+  if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && !pressed[1])
   {
-    angle[1] -= 2.0f;
+    angle[0] -= 15.0f;
     update_position(model);
+    pressed[1] = true;
+  } else if (glfwGetKey(window, GLFW_KEY_RIGHT) != GLFW_PRESS)
+  {
+    pressed[1] = false;
   }
-  if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)    // 1 direction to down
+  if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS && !pressed[2])      // 0 direction to up
   {
-    angle[1] += 2.0f;
+    angle[1] -= 15.0f;
     update_position(model);
+    pressed[2] = true;
+  } else if (glfwGetKey(window, GLFW_KEY_UP) != GLFW_PRESS)
+  {
+    pressed[2] = false;
   }
-  if (glfwGetKey(window, GLFW_KEY_KP_8) == GLFW_PRESS)    // 1 direction to down
+  if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS && !pressed[3])    // 1 direction to down
   {
-    angle[2] -= 2.0f;
+    angle[1] += 15.0f;
     update_position(model);
+    pressed[3] = true;
+  } else if (glfwGetKey(window, GLFW_KEY_DOWN) != GLFW_PRESS)
+  {
+    pressed[3] = false;
   }
-  if (glfwGetKey(window, GLFW_KEY_KP_2) == GLFW_PRESS)    // 1 direction to down
+  if (glfwGetKey(window, GLFW_KEY_KP_8) == GLFW_PRESS && !pressed[4])    // 1 direction to down
   {
-    angle[2] += 2.0f;
+    angle[2] -= 15.0f;
     update_position(model);
+    pressed[4] = true;
+  } else if (glfwGetKey(window, GLFW_KEY_KP_8) != GLFW_PRESS)
+  {
+    pressed[4] = false;
   }
-  if (glfwGetKey(window, GLFW_KEY_KP_4) == GLFW_PRESS)    // 1 direction to down
+  if (glfwGetKey(window, GLFW_KEY_KP_2) == GLFW_PRESS && !pressed[5])    // 1 direction to down
   {
-    angle[3] -= 2.0f;
+    angle[2] += 15.0f;
     update_position(model);
+    pressed[5] = true;
+  } else if (glfwGetKey(window, GLFW_KEY_KP_2) != GLFW_PRESS)
+  {
+    pressed[5] = false;
   }
-  if (glfwGetKey(window, GLFW_KEY_KP_6) == GLFW_PRESS)    // 1 direction to down
+  if (glfwGetKey(window, GLFW_KEY_KP_4) == GLFW_PRESS && !pressed[6])    // 1 direction to down
   {
-    angle[3] += 2.0f;
+    angle[3] -= 15.0f;
     update_position(model);
+    pressed[6] = true;
+  } else if (glfwGetKey(window, GLFW_KEY_KP_4) != GLFW_PRESS)
+  {
+    pressed[6] = false;
   }
-  if (glfwGetKey(window, GLFW_KEY_KP_1) == GLFW_PRESS)    // 1 direction to down
+  if (glfwGetKey(window, GLFW_KEY_KP_6) == GLFW_PRESS && !pressed[7])    // 1 direction to down
   {
-    angle[4] -= 2.0f;
+    angle[3] += 15.0f;
     update_position(model);
+    pressed[7] = true;
+  } else if (glfwGetKey(window, GLFW_KEY_KP_6) != GLFW_PRESS)
+  {
+    pressed[7] = false;
   }
-  if (glfwGetKey(window, GLFW_KEY_KP_3) == GLFW_PRESS)    // 1 direction to down
+  if (glfwGetKey(window, GLFW_KEY_KP_1) == GLFW_PRESS && !pressed[8])    // 1 direction to down
   {
-    angle[4] += 2.0f;
+    angle[4] -= 15.0f;
     update_position(model);
+    pressed[8] = true;
+  } else if (glfwGetKey(window, GLFW_KEY_KP_1) != GLFW_PRESS)
+  {
+    pressed[8] = false;
+  }
+  if (glfwGetKey(window, GLFW_KEY_KP_3) == GLFW_PRESS && !pressed[9])    // 1 direction to down
+  {
+    angle[4] += 15.0f;
+    update_position(model);
+    pressed[9] = true;
+  } else if (glfwGetKey(window, GLFW_KEY_KP_3) != GLFW_PRESS)
+  {
+    pressed[9] = false;
   }
   if (glfwGetKey(window, GLFW_KEY_KP_7) == GLFW_PRESS)    // 1 direction to down
   {

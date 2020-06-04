@@ -28,7 +28,7 @@ private:
   void updateCameraVector();
 
 public:
-  camera(glm::vec3 Pos = glm::vec3(0.0f, 0.0f, 3.0f),
+  camera(glm::vec3 Pos = glm::vec3(2.0f, 2.5f, 5.0f),
          glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f),
          glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f), float pitch = PITCH,
          float yaw = YAW, float fov = FOV)
