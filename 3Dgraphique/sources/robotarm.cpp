@@ -1,7 +1,6 @@
 #include "robotarm.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <iostream>
 void robot::ModelInitPos() {
     model.resize(8);
     std::cout << "get size " << model.size() << std::endl;
@@ -108,7 +107,7 @@ void robot::wrist_rot()
   model[GRIPPERL] = glm::translate(model[GRIPPERL], ppivot - positionGripperR);
   model[GRIPPERR] = glm::translate(model[GRIPPERR], ppivot - positionGripperL);
   for (unsigned int i = 4; i < sz; i++) {
-      model[i] = glm::rotate(model[i], glm::radians(angle[ANGLE_GRIPPER]), glm::vec3(0.98052, 0.0, 0.1964));
+      model[i] = glm::rotate(model[i], glm::radians(angle[ANGLE_WRIST]), glm::vec3(0.98052, 0.0, 0.1964));
   }
   model[WRIST] = glm::translate(model[WRIST], positionWrist - ppivot);
   model[RAIL] = glm::translate(model[RAIL], positionRail - ppivot);
@@ -135,7 +134,7 @@ void robot::rail_rot()
 void robot::wrist_mov()
 {
   float cld =  14.0;
-  if (angle[ANGLE_WRIST] == -1) {
+  if (angle[ANGLE_GRIPPER] == -1) {
     model[GRIPPERL] = glm::translate(model[6], glm::vec3(cld, 0.0, cld * 0.1964));
     model[GRIPPERR] = glm::translate(model[7], glm::vec3(-cld, 0.0, -cld * 0.1964));
   }

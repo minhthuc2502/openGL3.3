@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <glm/glm.hpp>
-
+#include <iostream>
 // Index of each part's model matrix
 enum ModelMatIndex {BASE, SHOULDER, BICEP_BELOW, BICEP_ABOVE, WRIST, RAIL, GRIPPERL, GRIPPERR};
 enum AngleRotation {ANGLE_SHOULDER, ANGLE_BICEP_BELOW, ANGLE_BICEP_ABOVE, ANGLE_WRIST, ANGLE_RAIL, ANGLE_GRIPPER};
