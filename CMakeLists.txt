@@ -33,7 +33,6 @@ target_link_libraries(bras3D
                         dl
                         pthread
                         GL
-                        Xrandr
                         assimp
                         ${GLEW_LIBRARIES}
                         ${GLM_LIBRARIES}
