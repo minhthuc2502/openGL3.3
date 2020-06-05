@@ -177,8 +177,7 @@ int main() {
   glfwSetScrollCallback(uwindow.mpwindow, scroll_callback);
 
   // Load models
-  char path[] = "../3Dgraphique/images/arm-test/base_bm.obj";
-  Model Base(path);
+  Model Base((char*)"../3Dgraphique/images/arm-test/base_bm.obj");
   Model Shoulder((char*)"../3Dgraphique/images/arm-test/shoulder_b.obj");
   Model Elbow((char*)"../3Dgraphique/images/arm-test/bicep_b.obj");
   Model ElbowUp((char*)"../3Dgraphique/images/arm-test/bicep001_b.obj");
@@ -186,9 +185,7 @@ int main() {
   Model GRail((char*)"../3Dgraphique/images/arm-test/gRail_b.obj");
   Model GripperL((char*)"../3Dgraphique/images/arm-test/gripper_b.obj");
   Model GripperR((char*)"../3Dgraphique/images/arm-test/gripper001_b.obj");
-  cout << "Maybe error after this point" << endl;
   rbArm.ModelInitPos();
-  cout << "Maybe error after this point" << endl;
   while (!glfwWindowShouldClose(uwindow.mpwindow)) {
     // check if user press esc key (INPUT)
     processInput(uwindow.mpwindow);
@@ -215,7 +212,7 @@ int main() {
     projection = glm::perspective(glm::radians(ucamera.getFov()),
                                   800.0f / 600.0f, 0.1f, 100.0f);
     pShader.set4MatrixFloat("projection", projection);
-    // draw object
+    // Set model matrix and draw object
     pShader.set4MatrixFloat("model", rbArm.model[BASE]);
     Base.draw(pShader);
     pShader.set4MatrixFloat("model", rbArm.model[SHOULDER]);
@@ -237,6 +234,7 @@ int main() {
     // catch event
     glfwPollEvents();
   }
+  // terminate window
   glfwTerminate();
   return 0;
 }

@@ -1,0 +1,14 @@
+language: cpp 
+
+# Install dependencies
+addons:
+    apt:
+      packages:
+        - cmake
+        - libglfw3-dev
+        - libglew-dev
+        - libglm-dev
+        - libassimp-dev
+# Build code
+script:
+    - ./build.sh all

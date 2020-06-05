@@ -51,7 +51,6 @@ void Mesh::setupMesh() {
                         (void *)offsetof(Vertex, TexCoords));
 
   glBindVertexArray(0);
-  //cout << "Set up Mesh" << endl;
 }
 
 void Mesh::draw(Shader shader) {

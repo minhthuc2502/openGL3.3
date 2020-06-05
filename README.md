@@ -11,6 +11,8 @@ $ sudo apt-get install libglfw3-dev
 $ sudo apt-get install libglew-dev
 # Install libglm-dev. A header for C++ mathematics library for graphics software.
 $ sudo apt-get install libglm-dev
+# Install libassimp-dev. Library to load model from file .obj
+$ sudo apt-get install libassimp-dev
 ```
 
 ## Run 3D graphique

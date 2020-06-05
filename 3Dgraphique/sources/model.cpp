@@ -17,7 +17,7 @@ void Model::loadModel(string path) {
 
   if (!scene || (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) ||
       !(scene->mRootNode)) {
-    //cout << "ERROR::ASSIMP::" << import.GetErrorString() << endl;
+    cout << "ERROR::ASSIMP::" << import.GetErrorString() << endl;
     return;
   }
   directory = path.substr(0, path.find_last_of('/'));
@@ -30,7 +30,6 @@ void Model::processNode(aiNode *node, const aiScene *scene) {
     aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
     meshes.push_back(processMesh(mesh, scene));
   }
-  //cout << "num mesh " << node->mNumMeshes << endl;
   // then do the same for each of its children
   for (unsigned int i = 0; i < node->mNumChildren; i++) {
     processNode(node->mChildren[i], scene);
@@ -41,7 +40,6 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
   vector<Vertex> vertices;
   vector<unsigned int> indices;
   vector<Texture> textures;
-  //cout << "num vertices " << mesh->mNumVertices << endl;
   for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
     Vertex vertex;
     // process vertex positions, normal and texture coordiantes
@@ -149,7 +147,6 @@ unsigned int TextureFromFile(const char *path, const string &directory) {
 
     stbi_image_free(data);
   } else {
-    //cout << "Texture failed to load at path: " << path << endl;
     stbi_image_free(data);
   }
   return textureID;

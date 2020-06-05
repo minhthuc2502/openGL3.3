@@ -3,19 +3,11 @@
 #include <glm/gtc/type_ptr.hpp>
 void robot::ModelInitPos() {
     model.resize(8);
-    std::cout << "get size " << model.size() << std::endl;
-    std::cout << "model init" << std::endl;
-    //std::vector<glm::mat4>::size_type sz = model.size();
-    //std::cout << "get size " << sz << std::endl;
     for (unsigned int i = 0; i < 8; i++)
     {
-        std::cout << "count " << i << std::endl;
         model[i] = glm::mat4(0.1f);
-        std::cout << "init mat" << std::endl;
         model[i] = glm::scale(model[i], glm::vec3(0.2f, 0.2f, 0.2f));
-        std::cout << "scale mat" << std::endl;
     }
-    std::cout << "loop for all model" << std::endl;
     // Set position initiale
     model[SHOULDER] = glm::translate(model[SHOULDER], positionShoulder);
     model[BICEP_BELOW] = glm::translate(model[BICEP_BELOW], positionBicepBelow);
@@ -24,7 +16,6 @@ void robot::ModelInitPos() {
     model[RAIL] = glm::translate(model[RAIL], positionRail);
     model[GRIPPERL] = glm::translate(model[GRIPPERL], positionGripperR);
     model[GRIPPERR] = glm::translate(model[GRIPPERR], positionGripperL);
-    std::cout << "finish" << std::endl;
 }
 
 void robot::shoulder_rot()
