@@ -11,7 +11,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 find_package(PkgConfig REQUIRED)
 pkg_search_module(GLFW REQUIRED glfw3)
 pkg_search_module(GLEW REQUIRED glew)
-pkg_search_module(GLM REQUIRED glm)
+pkg_search_module(glm REQUIRED glm)
 
 #Setting
 include_directories(${CMAKE_SOURCE_DIR}/3Dgraphique/includes
